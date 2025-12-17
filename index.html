@@ -3,444 +3,343 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
-    <title>Mona Montreux | SYSTEM OS</title>
+    <title>Mona | Guest Portal</title>
     
-    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600&family=Manrope:wght@300;400;500;600&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 
     <style>
         /* ========================================================================
-           THEME: "CYBER-LUXURY" ($10k AESTHETIC)
-           Complex gradients, noise textures, blur filters, terminal fonts.
+           THEME: "NOIR ELITE"
+           Deep blacks, gold accents, absolute minimalism.
         ======================================================================== */
         :root {
-            --neon-blue: #00f3ff;
-            --neon-purple: #bc13fe;
-            --glass-surface: rgba(10, 10, 12, 0.65);
-            --glass-border: rgba(255, 255, 255, 0.1);
-            --text-primary: #ffffff;
-            --text-secondary: rgba(255, 255, 255, 0.6);
-            --system-font: 'Space Grotesk', monospace;
-            --body-font: 'Inter', sans-serif;
-            --ease-out-expo: cubic-bezier(0.19, 1, 0.22, 1);
+            --bg-deep: #050505;
+            --bg-card: #121212;
+            --accent-gold: #D4AF37;
+            --text-primary: #F5F5F5;
+            --text-muted: #666666;
+            --border-subtle: rgba(255, 255, 255, 0.08);
+            --font-display: 'Cinzel', serif;
+            --font-body: 'Manrope', sans-serif;
+            --ease-luxury: cubic-bezier(0.22, 1, 0.36, 1);
         }
 
-        * { box-sizing: border-box; user-select: none; -webkit-tap-highlight-color: transparent; }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         
-        body, html {
-            margin: 0; padding: 0; width: 100%; height: 100%;
-            overflow: hidden; background: #000;
-            font-family: var(--body-font);
-        }
-
-        /* BACKGROUND: Simulating a high-end hotel website behind the bot */
-        #simulated-site {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background: radial-gradient(circle at 50% 50%, #1a1a2e 0%, #000000 100%);
-            z-index: 0; display: flex; align-items: center; justify-content: center;
-            color: #333; flex-direction: column;
-        }
-        #simulated-site h1 { font-family: 'Space Grotesk'; font-size: 4vw; opacity: 0.2; letter-spacing: 10px; text-transform: uppercase; }
-
-        /* ========================================================================
-           COMPONENT 1: THE "BOOT SEQUENCE" OVERLAY
-           (This sells the "Advanced" feel immediately)
-        ======================================================================== */
-        #boot-screen {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: #000; z-index: 9999999;
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            font-family: var(--system-font); color: var(--neon-blue);
-        }
-        
-        .boot-log { font-size: 12px; opacity: 0.7; margin-top: 20px; text-align: left; width: 300px; }
-        .log-line { margin: 4px 0; opacity: 0; animation: typeLine 0.1s forwards; }
-        
-        .loader-ring {
-            width: 80px; height: 80px; border: 2px solid rgba(0, 243, 255, 0.2);
-            border-top: 2px solid var(--neon-blue); border-radius: 50%;
-            animation: spin 1s linear infinite;
+        body {
+            margin: 0; padding: 0; background-color: var(--bg-deep);
+            color: var(--text-primary); font-family: var(--font-body);
+            height: 100vh; overflow: hidden; display: flex; justify-content: center;
         }
 
         /* ========================================================================
-           COMPONENT 2: THE "ORB" (Living Launcher)
+           VIEW MANAGER (Login -> Dashboard -> Chat)
         ======================================================================== */
-        #mona-launcher {
-            position: fixed; bottom: 40px; right: 40px;
-            width: 80px; height: 80px; z-index: 99999;
-            cursor: pointer; transform-style: preserve-3d;
-            transition: transform 0.5s var(--ease-out-expo);
-        }
-        
-        #mona-launcher:hover { transform: scale(1.1); }
-        
-        .orb-outer {
-            position: absolute; width: 100%; height: 100%; border-radius: 50%;
-            border: 1px solid rgba(255,255,255,0.1);
-            background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.1), rgba(0,0,0,0.8));
-            backdrop-filter: blur(5px); box-shadow: 0 0 30px rgba(0, 243, 255, 0.2);
-            animation: float 6s ease-in-out infinite;
-        }
-        
-        .orb-core {
-            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            width: 40px; height: 40px; background: var(--neon-blue);
-            border-radius: 50%; filter: blur(15px);
-            animation: pulse-core 3s infinite;
+        .view-container {
+            width: 100%; max-width: 480px; height: 100%; position: relative;
+            background: var(--bg-deep); overflow: hidden; box-shadow: 0 0 50px rgba(0,0,0,0.5);
         }
 
-        .orb-ring {
+        .view-section {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            border: 1px solid var(--neon-blue); border-radius: 50%;
-            opacity: 0; animation: ripple 2s infinite;
+            padding: 30px; display: flex; flex-direction: column;
+            opacity: 0; pointer-events: none; transform: scale(0.95) translateY(20px);
+            transition: all 0.6s var(--ease-luxury);
+        }
+
+        .view-section.active {
+            opacity: 1; pointer-events: auto; transform: scale(1) translateY(0); z-index: 10;
         }
 
         /* ========================================================================
-           COMPONENT 3: THE "COMMAND CENTER" (The Chat Window)
+           VIEW 1: THE VAULT LOGIN
         ======================================================================== */
-        #mona-os {
-            position: fixed; bottom: 140px; right: 40px;
-            width: 450px; height: 750px;
-            background: var(--glass-surface);
-            backdrop-filter: blur(40px) saturate(150%);
-            -webkit-backdrop-filter: blur(40px) saturate(150%);
-            border: 1px solid var(--glass-border);
-            border-radius: 20px;
-            box-shadow: 0 40px 100px rgba(0,0,0,0.6);
-            display: flex; flex-direction: column;
-            overflow: hidden; opacity: 0;
-            transform: translateY(50px) scale(0.9); pointer-events: none;
-            transition: all 0.6s var(--ease-out-expo);
-            z-index: 9999;
+        #view-login { justify-content: center; align-items: center; text-align: center; }
+
+        .brand-logo {
+            font-family: var(--font-display); font-size: 32px; letter-spacing: 4px;
+            color: var(--text-primary); margin-bottom: 40px; text-transform: uppercase;
+            border-bottom: 1px solid var(--accent-gold); padding-bottom: 10px;
         }
 
-        #mona-os.active {
-            opacity: 1; transform: translateY(0) scale(1); pointer-events: auto;
+        .login-card { width: 100%; }
+        
+        .input-group { position: relative; margin-bottom: 25px; }
+        
+        .luxury-input {
+            width: 100%; background: transparent; border: none;
+            border-bottom: 1px solid var(--text-muted); padding: 15px 5px;
+            color: white; font-size: 18px; font-family: var(--font-display);
+            letter-spacing: 2px; text-align: center; outline: none;
+            transition: border-color 0.3s;
         }
+        .luxury-input:focus { border-color: var(--accent-gold); }
+        .luxury-input::placeholder { color: #333; font-family: var(--font-body); letter-spacing: 0; font-size: 14px; }
 
-        /* --- OS HEADER (Status & Stats) --- */
-        .os-header {
-            padding: 20px; border-bottom: 1px solid var(--glass-border);
-            background: rgba(0,0,0,0.2); display: flex; justify-content: space-between; align-items: center;
+        .gold-btn {
+            background: var(--accent-gold); color: black; border: none;
+            padding: 16px 40px; font-size: 14px; letter-spacing: 1px;
+            text-transform: uppercase; font-weight: 600; cursor: pointer;
+            clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
+            transition: transform 0.2s; margin-top: 20px;
+        }
+        .gold-btn:active { transform: scale(0.95); }
+
+        .error-msg { color: #ff4444; font-size: 12px; margin-top: 15px; opacity: 0; transition: opacity 0.3s; }
+
+        /* ========================================================================
+           VIEW 2: THE DASHBOARD (The $15k Feature)
+        ======================================================================== */
+        #view-dashboard { padding: 0; background: var(--bg-card); }
+
+        .dash-header {
+            padding: 30px; background: var(--bg-deep);
+            border-bottom: 1px solid var(--border-subtle);
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .guest-welcome h2 { margin: 0; font-family: var(--font-display); font-size: 20px; color: var(--accent-gold); }
+        .guest-welcome p { margin: 5px 0 0; font-size: 12px; color: var(--text-muted); }
+
+        .logout-btn { background: none; border: 1px solid var(--border-subtle); color: var(--text-muted); padding: 8px 12px; font-size: 10px; cursor: pointer; }
+
+        .stats-grid {
+            display: grid; grid-template-columns: 1fr 1fr; gap: 1px;
+            background: var(--border-subtle); margin-bottom: 20px;
+        }
+        .stat-box {
+            background: var(--bg-deep); padding: 20px; text-align: center;
+        }
+        .stat-value { font-size: 24px; font-family: var(--font-display); color: white; display: block; margin-bottom: 5px; }
+        .stat-label { font-size: 10px; text-transform: uppercase; color: var(--text-muted); letter-spacing: 1px; }
+
+        /* THE CHAT AREA (Embedded) */
+        .embedded-chat {
+            flex: 1; display: flex; flex-direction: column; background: var(--bg-card); position: relative;
+        }
+        .chat-stream {
+            flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 20px;
+        }
+        .chat-input-area {
+            padding: 20px; background: var(--bg-deep); border-top: 1px solid var(--border-subtle);
+            display: flex; gap: 10px;
         }
         
-        .sys-info h2 { margin: 0; font-family: var(--system-font); font-size: 14px; letter-spacing: 2px; color: var(--text-primary); text-transform: uppercase; }
-        .sys-info .status { font-size: 10px; color: var(--neon-blue); display: flex; align-items: center; gap: 6px; margin-top: 4px; }
-        .blink { width: 6px; height: 6px; background: var(--neon-blue); border-radius: 50%; animation: blink 2s infinite; }
-
-        /* Fake System Graphs */
-        .sys-graphs { display: flex; gap: 4px; align-items: flex-end; height: 20px; }
-        .bar { width: 3px; background: var(--text-secondary); border-radius: 2px; animation: equalize 1s infinite alternate; }
-        .bar:nth-child(1) { height: 60%; animation-delay: 0.1s; }
-        .bar:nth-child(2) { height: 90%; animation-delay: 0.2s; }
-        .bar:nth-child(3) { height: 40%; animation-delay: 0.3s; }
-
-        /* --- STREAM (Chat Area) --- */
-        .os-stream {
-            flex: 1; padding: 20px; overflow-y: auto; overflow-x: hidden;
-            display: flex; flex-direction: column; gap: 20px;
-            /* Grid overlay for "tech" feel */
-            background-image: 
-                linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
-            background-size: 40px 40px;
-        }
-
-        /* Messages */
-        .msg-row { display: flex; flex-direction: column; gap: 5px; opacity: 0; animation: slideUp 0.4s forwards; }
-        .msg-row.bot { align-items: flex-start; }
-        .msg-row.user { align-items: flex-end; }
-
-        .bubble {
-            max-width: 85%; padding: 14px 18px; font-size: 14px; line-height: 1.6;
-            color: var(--text-primary); border-radius: 12px; position: relative;
-        }
+        /* Message Bubbles - Minimalist */
+        .msg { max-width: 85%; padding: 12px 16px; font-size: 14px; line-height: 1.6; }
+        .msg.bot { color: var(--text-muted); border-left: 2px solid var(--accent-gold); padding-left: 15px; }
+        .msg.user { color: white; background: rgba(255,255,255,0.05); align-self: flex-end; border-radius: 4px; }
         
-        .bubble.bot {
-            background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border);
-            border-left: 2px solid var(--neon-blue); /* Tech Accent */
+        #chat-input {
+            flex: 1; background: transparent; border: none; color: white; outline: none; font-family: var(--font-body);
         }
-        
-        .bubble.user {
-            background: rgba(0, 243, 255, 0.15); border: 1px solid rgba(0, 243, 255, 0.3);
-            text-shadow: 0 0 10px rgba(0, 243, 255, 0.3);
-        }
-
-        .meta { font-family: var(--system-font); font-size: 9px; opacity: 0.5; margin: 0 5px; text-transform: uppercase; }
-
-        /* --- CARDS & WIDGETS --- */
-        .weather-widget {
-            background: linear-gradient(135deg, #1e293b, #0f172a); border-radius: 12px;
-            padding: 15px; display: flex; align-items: center; justify-content: space-between;
-            border: 1px solid var(--glass-border); margin-bottom: 10px;
-        }
-
-        /* --- INPUT DECK --- */
-        .os-footer {
-            padding: 20px; background: rgba(0,0,0,0.4);
-            border-top: 1px solid var(--glass-border);
-        }
-        
-        .input-wrapper {
-            position: relative; border: 1px solid var(--glass-border);
-            border-radius: 8px; background: rgba(255,255,255,0.03);
-            display: flex; align-items: center; padding: 5px;
-            transition: all 0.3s;
-        }
-        .input-wrapper:focus-within { border-color: var(--neon-blue); box-shadow: 0 0 15px rgba(0, 243, 255, 0.1); }
-
-        #cmd-input {
-            flex: 1; background: transparent; border: none; padding: 12px;
-            color: var(--text-primary); font-family: var(--body-font); font-size: 14px;
-            outline: none;
-        }
-
-        #send-btn {
-            width: 40px; height: 40px; background: var(--neon-blue);
-            border: none; border-radius: 6px; cursor: pointer;
-            color: #000; font-weight: bold;
-            display: flex; align-items: center; justify-content: center;
-        }
-
-        /* --- BIOMETRIC SCANNER OVERLAY --- */
-        #scan-overlay {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.8); z-index: 10;
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            opacity: 0; pointer-events: none; transition: opacity 0.5s;
-        }
-        #scan-overlay.active { opacity: 1; pointer-events: auto; }
-        
-        .scan-line {
-            width: 100%; height: 2px; background: var(--neon-blue);
-            box-shadow: 0 0 20px var(--neon-blue);
-            animation: scan 2s infinite linear;
-            position: absolute; top: 0;
-        }
-        
-        .face-frame {
-            width: 200px; height: 200px; border: 2px solid rgba(255,255,255,0.2);
-            position: relative; border-radius: 20px; overflow: hidden;
-        }
-        .face-frame::after {
-            content: "AUTHENTICATING..."; position: absolute; bottom: 10px; width: 100%;
-            text-align: center; color: var(--neon-blue); font-family: var(--system-font); font-size: 10px; animation: blink 1s infinite;
-        }
-
-        /* ANIMATIONS */
-        @keyframes spin { 100% { transform: rotate(360deg); } }
-        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
-        @keyframes pulse-core { 0%, 100% { opacity: 0.5; transform: translate(-50%, -50%) scale(1); } 50% { opacity: 1; transform: translate(-50%, -50%) scale(1.2); } }
-        @keyframes ripple { 0% { transform: scale(1); opacity: 0.8; } 100% { transform: scale(2); opacity: 0; } }
-        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
-        @keyframes equalize { 0% { height: 20%; } 100% { height: 100%; } }
-        @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-        @keyframes typeLine { to { opacity: 1; } }
-        @keyframes scan { 0% { top: 0%; opacity: 0; } 50% { opacity: 1; } 100% { top: 100%; opacity: 0; } }
 
     </style>
 </head>
 <body>
 
-    <div id="simulated-site">
-        <h1>Hotel Montreux</h1>
-    </div>
-
-    <div id="boot-screen">
-        <div class="loader-ring"></div>
-        <div class="boot-log" id="boot-log"></div>
-    </div>
-
-    <div id="mona-launcher" onclick="MonaOS.toggle()">
-        <div class="orb-ring"></div>
-        <div class="orb-outer"></div>
-        <div class="orb-core"></div>
-    </div>
-
-    <div id="mona-os">
+<div class="view-container">
+    
+    <div id="view-login" class="view-section active">
+        <div class="brand-logo">Montreux</div>
+        <p style="color: var(--text-muted); font-size: 12px; margin-bottom: 40px;">PRIVATE GUEST PORTAL</p>
         
-        <div class="os-header">
-            <div class="sys-info">
-                <h2>Mona OS v12.4</h2>
-                <div class="status"><div class="blink"></div> SYSTEM ONLINE</div>
+        <div class="login-card">
+            <div class="input-group">
+                <input type="text" id="booking-id" class="luxury-input" placeholder="BOOKING REFERENCE" autocomplete="off">
             </div>
-            <div class="sys-graphs">
-                <div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div>
+            <div class="input-group">
+                <input type="password" id="passcode" class="luxury-input" placeholder="ACCESS CODE" autocomplete="off">
+            </div>
+            
+            <button class="gold-btn" onclick="Portal.login()">Access Suite</button>
+            <div id="login-error" class="error-msg">Invalid Credentials</div>
+        </div>
+    </div>
+
+    <div id="view-dashboard" class="view-section">
+        <div class="dash-header">
+            <div class="guest-welcome">
+                <h2 id="guest-name">Welcome</h2>
+                <p id="room-info">Loading suite details...</p>
+            </div>
+            <button class="logout-btn" onclick="Portal.logout()">SECURE EXIT</button>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-box">
+                <span class="stat-value" id="wifi-code">...</span>
+                <span class="stat-label">Wi-Fi Access</span>
+            </div>
+            <div class="stat-box">
+                <span class="stat-value" id="curr-bill">...</span>
+                <span class="stat-label">Current Bill</span>
             </div>
         </div>
 
-        <div id="scan-overlay">
-            <div class="face-frame">
-                <div class="scan-line"></div>
-                <img src="https://cdn-icons-png.flaticon.com/512/747/747376.png" style="width: 100%; height: 100%; opacity: 0.2; filter: invert(1);">
+        <div class="embedded-chat">
+            <div id="chat-stream" class="chat-stream">
+                <div class="msg bot">System Initialized. I am Mona, your dedicated concierge. How may I assist you this evening?</div>
             </div>
-        </div>
-
-        <div class="os-stream" id="stream">
-            </div>
-
-        <div class="os-footer">
-            <div class="input-wrapper">
-                <input type="text" id="cmd-input" placeholder="Enter command or message..." autocomplete="off">
-                <button id="send-btn" onclick="MonaOS.send()">➜</button>
+            <div class="chat-input-area">
+                <input type="text" id="chat-input" placeholder="Type a request..." onkeydown="if(event.key==='Enter') Portal.send()">
+                <button class="gold-btn" style="padding: 10px 20px; margin: 0; font-size: 10px;" onclick="Portal.send()">SEND</button>
             </div>
         </div>
     </div>
+
+</div>
 
 <script>
     /**
-     * MONA OS - MAXIMALIST EDITION
-     * "Because less code isn't luxury."
+     * MONA PORTAL KERNEL
+     * Handles Authentication, Session State, and Secured Chat
      */
-    const MonaOS = (() => {
+    const Portal = (() => {
         
-        const STATE = {
-            booted: false,
-            open: false,
-            authenticated: false,
-            soundEnabled: true,
-            history: []
-        };
-        
-        const DOM = {
-            boot: document.getElementById('boot-screen'),
-            log: document.getElementById('boot-log'),
-            os: document.getElementById('mona-os'),
-            stream: document.getElementById('stream'),
-            input: document.getElementById('cmd-input'),
-            scan: document.getElementById('scan-overlay')
-        };
-
+        // --- 1. CONFIG & STATE ---
         const CONFIG = {
-            webhook: "https://n8n.srv1106816.hstgr.cloud/webhook/595269c9-1640-45c9-9c2b-861a69417966"
-        };
-
-        // --- 1. BOOT SEQUENCE (The "Movie" Intro) ---
-        const runBoot = async () => {
-            const lines = [
-                "INITIALIZING NEURAL NET...",
-                "CHECKING BIOMETRIC SENSORS...",
-                "CONNECTING TO HOTEL SECURE SERVER...",
-                "LOADING CONCIERGE PROTOCOLS...",
-                "SYSTEM READY."
-            ];
-
-            for (let line of lines) {
-                const div = document.createElement('div');
-                div.className = 'log-line';
-                div.innerText = "> " + line;
-                DOM.log.appendChild(div);
-                await wait(400); // Fake processing time
-            }
-
-            await wait(500);
-            DOM.boot.style.opacity = '0';
-            setTimeout(() => DOM.boot.remove(), 1000);
-            STATE.booted = true;
-            
-            // Auto-open first time
-            setTimeout(() => toggle(), 800);
-        };
-
-        // --- 2. CORE FUNCTIONS ---
-        const toggle = () => {
-            STATE.open = !STATE.open;
-            DOM.os.classList.toggle('active', STATE.open);
-            
-            if (STATE.open && !STATE.authenticated) {
-                runBiometrics();
+            webhookUrl: "https://n8n.srv1106816.hstgr.cloud/webhook/595269c9-1640-45c9-9c2b-861a69417966",
+            // In a real app, this verifies against an API. For demo, we simulate DB.
+            mockDB: {
+                "RES-8821": { name: "Mr. Wick", room: "Penthouse 404", wifi: "GOLD_8821", bill: "$4,250", code: "1234" },
+                "DEMO": { name: "Valued Guest", room: "Suite 101", wifi: "GUEST_101", bill: "$0.00", code: "0000" }
             }
         };
 
-        const runBiometrics = async () => {
-            DOM.scan.classList.add('active');
-            await wait(2000); // Fake scan time
-            DOM.scan.classList.remove('active');
-            STATE.authenticated = true;
-            
-            addMessage({ text: "Identity Verified. Welcome, Guest.", sender: 'system' });
-            
-            if (STATE.history.length === 0) {
-                addMessage({ text: "I am Mona. I have access to Room Service, Spa Bookings, and Local Transport. How may I assist?", sender: 'bot' });
+        const STATE = {
+            user: null,
+            token: null
+        };
+
+        const DOM = {
+            views: {
+                login: document.getElementById('view-login'),
+                dash: document.getElementById('view-dashboard')
+            },
+            inputs: {
+                booking: document.getElementById('booking-id'),
+                code: document.getElementById('passcode'),
+                chat: document.getElementById('chat-input')
+            },
+            labels: {
+                error: document.getElementById('login-error'),
+                name: document.getElementById('guest-name'),
+                room: document.getElementById('room-info'),
+                wifi: document.getElementById('wifi-code'),
+                bill: document.getElementById('curr-bill')
+            },
+            stream: document.getElementById('chat-stream')
+        };
+
+        // --- 2. AUTHENTICATION ENGINE ---
+        const init = () => {
+            // Check persistence
+            const saved = localStorage.getItem('mona_auth');
+            if (saved) {
+                const session = JSON.parse(saved);
+                // Simple session validation (mock)
+                if (CONFIG.mockDB[session.id]) {
+                    loginSuccess(session.id);
+                }
             }
         };
 
-        const addMessage = (msg) => {
+        const login = () => {
+            const id = DOM.inputs.booking.value.toUpperCase();
+            const code = DOM.inputs.code.value;
+            
+            // Validate against Mock DB
+            const record = CONFIG.mockDB[id];
+            
+            if (record && record.code === code) {
+                loginSuccess(id);
+            } else {
+                DOM.labels.error.style.opacity = '1';
+                setTimeout(() => DOM.labels.error.style.opacity = '0', 2000);
+            }
+        };
+
+        const loginSuccess = (id) => {
+            const data = CONFIG.mockDB[id];
+            STATE.user = data;
+            STATE.token = "SECURE_" + Date.now(); // Fake Token
+            
+            // Persist
+            localStorage.setItem('mona_auth', JSON.stringify({ id: id, timestamp: Date.now() }));
+
+            // Update Dashboard
+            DOM.labels.name.innerText = `Welcome, ${data.name}`;
+            DOM.labels.room.innerText = data.room;
+            DOM.labels.wifi.innerText = data.wifi;
+            DOM.labels.bill.innerText = data.bill;
+
+            // Transition View
+            DOM.views.login.classList.remove('active');
+            DOM.views.dash.classList.add('active');
+        };
+
+        const logout = () => {
+            localStorage.removeItem('mona_auth');
+            location.reload();
+        };
+
+        // --- 3. SECURE CHAT ENGINE ---
+        const addMessage = (text, type) => {
             const div = document.createElement('div');
-            div.className = `msg-row ${msg.sender}`;
-            
-            let content = msg.text;
-            if (msg.sender === 'bot') content = marked.parse(msg.text);
-
-            div.innerHTML = `
-                <div class="meta">${msg.sender === 'bot' ? 'AI CORE' : 'GUEST'} // ${new Date().toLocaleTimeString()}</div>
-                <div class="bubble ${msg.sender}">${content}</div>
-            `;
-            
+            div.className = `msg ${type}`;
+            if (type === 'bot') div.innerHTML = marked.parse(text);
+            else div.innerText = text;
             DOM.stream.appendChild(div);
             DOM.stream.scrollTop = DOM.stream.scrollHeight;
         };
 
         const send = async () => {
-            const text = DOM.input.value.trim();
-            if(!text) return;
-
-            DOM.input.value = '';
-            addMessage({ text, sender: 'user' });
-
-            // Fake "Processing" state
-            const processingId = showProcessing();
+            const text = DOM.inputs.chat.value.trim();
+            if (!text) return;
+            
+            DOM.inputs.chat.value = '';
+            addMessage(text, 'user');
 
             try {
-                const response = await fetch(CONFIG.webhook, {
+                // Here is the "Complex" part: We send the User Context to the AI
+                const payload = {
+                    chatInput: text,
+                    sessionId: STATE.token,
+                    // Injecting authenticated data so AI knows context
+                    guestContext: {
+                        name: STATE.user.name,
+                        room: STATE.user.room,
+                        bill: STATE.user.bill
+                    }
+                };
+
+                const res = await fetch(CONFIG.webhookUrl, {
                     method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({ chatInput: text, sessionId: 'MAX_OS_' + Date.now() })
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
                 });
                 
-                removeProcessing(processingId);
-                
-                const data = await response.json();
-                let reply = "Signal lost.";
+                const data = await res.json();
+                let reply = "Connection unstable.";
                 if (Array.isArray(data) && data[0]) reply = data[0].output || data[0].text;
                 else if (data.output || data.text) reply = data.output || data.text;
-
-                addMessage({ text: reply, sender: 'bot' });
+                
+                addMessage(reply, 'bot');
 
             } catch (e) {
-                removeProcessing(processingId);
-                addMessage({ text: "CRITICAL ERROR: Neural Link Severed.", sender: 'system' });
+                console.error(e);
+                addMessage("Secure link interrupted.", 'bot');
             }
         };
 
-        // --- UTILS ---
-        const showProcessing = () => {
-            const id = 'proc-' + Date.now();
-            const div = document.createElement('div');
-            div.id = id;
-            div.className = 'msg-row bot';
-            div.innerHTML = `<div class="meta">SYSTEM</div><div class="bubble bot" style="color:var(--neon-blue)">ANALYZING REQUEST...</div>`;
-            DOM.stream.appendChild(div);
-            return id;
-        };
+        // Initialize
+        init();
 
-        const removeProcessing = (id) => {
-            const el = document.getElementById(id);
-            if(el) el.remove();
-        };
+        return { login, logout, send };
 
-        const wait = (ms) => new Promise(r => setTimeout(r, ms));
-
-        // Event Listeners
-        DOM.input.addEventListener('keydown', (e) => {
-            if(e.key === 'Enter') send();
-        });
-
-        // Start
-        window.onload = runBoot;
-
-        return { toggle, send };
     })();
 </script>
+
 </body>
 </html>
