@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Mona OS | Enterprise Demo</title>
+    
+    <link rel="stylesheet" href="mona-theme.css">
+    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+</head>
+<body style="background: #e2e8f0; height: 100vh; display: flex; align-items: center; justify-content: center;">
+
+    <div style="text-align: center; color: #64748b;">
+        <h1>Hotel Montreux</h1>
+        <p>Enterprise Chatbot Loaded.</p>
+        <p>Click the orb in the bottom right.</p>
+    </div>
+
+    <script src="mona-core.js"></script> <script src="mona-ui.js"></script>   <script>
+        // BOOT SEQUENCE
+        document.addEventListener('DOMContentLoaded', async () => {
+            console.log("🚀 System: Booting...");
+            
+            // 1. Initialize Kernel
+            await window.MonaSystem.init();
+            
+            // 2. Initialize UI Engine (Attached to Kernel)
+            window.MonaSystem.ui = new UIController(window.MonaSystem);
+            
+            // 3. Inject into DOM
+            window.MonaSystem.ui.inject();
+            
+            console.log("✅ System: Online");
+        });
+    </script>
+
+</body>
+</html>
