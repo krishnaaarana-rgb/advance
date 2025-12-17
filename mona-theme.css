@@ -1,0 +1,192 @@
+/* MONA OS THEME ENGINE v10.0 */
+
+:root {
+    /* --- PALETTE: "Midnight Slate" --- */
+    --mona-bg: #0F172A;
+    --mona-surface: rgba(30, 41, 59, 0.75); /* Glass */
+    --mona-surface-solid: #1E293B;
+    --mona-primary: #38BDF8; /* Electric Blue */
+    --mona-accent: #818CF8;
+    --mona-text-main: #F1F5F9;
+    --mona-text-sub: #94A3B8;
+    --mona-border: rgba(255, 255, 255, 0.08);
+    
+    /* --- PHYSICS --- */
+    --ease-elastic: cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    --ease-smooth: cubic-bezier(0.16, 1, 0.3, 1);
+    
+    /* --- DIMENSIONS --- */
+    --win-width: 400px;
+    --win-height: 700px;
+    --launcher-size: 64px;
+}
+
+/* RESET */
+#mona-root * { box-sizing: border-box; -webkit-font-smoothing: antialiased; font-family: 'Inter', system-ui, sans-serif; }
+
+/* 1. CONTAINER */
+#mona-root {
+    position: fixed; bottom: 24px; right: 24px; z-index: 999999;
+    pointer-events: none; /* Let clicks pass through */
+    display: flex; flex-direction: column; align-items: flex-end; gap: 16px;
+}
+
+/* 2. THE WINDOW (Hidden by default) */
+#mona-window {
+    width: var(--win-width); height: var(--win-height);
+    max-width: calc(100vw - 48px); max-height: calc(100vh - 120px);
+    background: var(--mona-surface);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    border: 1px solid var(--mona-border);
+    border-radius: 24px;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    display: flex; flex-direction: column;
+    overflow: hidden;
+    
+    /* Animation State */
+    opacity: 0; transform: translateY(40px) scale(0.95);
+    transition: all 0.5s var(--ease-smooth);
+    pointer-events: none;
+}
+
+#mona-root.is-open #mona-window {
+    opacity: 1; transform: translateY(0) scale(1);
+    pointer-events: auto;
+}
+
+/* 3. HEADER */
+.mona-header {
+    padding: 20px 24px;
+    background: rgba(15, 23, 42, 0.6);
+    border-bottom: 1px solid var(--mona-border);
+    display: flex; justify-content: space-between; align-items: center;
+}
+
+.header-info h1 { margin: 0; font-size: 16px; font-weight: 600; color: var(--mona-text-main); }
+.status-badge { 
+    font-size: 11px; color: #4ADE80; font-weight: 500; display: flex; align-items: center; gap: 6px; margin-top: 4px;
+}
+.pulse { width: 6px; height: 6px; background: #4ADE80; border-radius: 50%; animation: pulse 2s infinite; }
+
+@keyframes pulse { 0% { opacity: 1; transform: scale(1); } 50% { opacity: 0.5; transform: scale(1.5); } 100% { opacity: 1; transform: scale(1); } }
+
+.btn-icon {
+    background: rgba(255,255,255,0.05); border: none; cursor: pointer;
+    width: 36px; height: 36px; border-radius: 12px; color: var(--mona-text-sub);
+    transition: 0.2s; display: flex; align-items: center; justify-content: center;
+}
+.btn-icon:hover { background: rgba(255,255,255,0.1); color: var(--mona-text-main); }
+.btn-icon svg { width: 18px; height: 18px; fill: currentColor; }
+
+/* 4. STREAM */
+#mona-stream {
+    flex: 1; padding: 24px;
+    overflow-y: auto; display: flex; flex-direction: column; gap: 16px;
+}
+#mona-stream::-webkit-scrollbar { width: 4px; }
+#mona-stream::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 4px; }
+
+/* MESSAGES */
+.msg-row { display: flex; flex-direction: column; gap: 4px; opacity: 0; animation: slideUp 0.4s var(--ease-smooth) forwards; }
+.msg-row.msg-user { align-items: flex-end; }
+.msg-row.msg-bot { align-items: flex-start; }
+
+.bubble {
+    max-width: 85%; padding: 12px 16px; border-radius: 18px;
+    font-size: 14px; line-height: 1.5; color: var(--mona-text-main);
+    position: relative;
+}
+
+.msg-bot .bubble {
+    background: var(--mona-surface-solid);
+    border-bottom-left-radius: 4px;
+    border: 1px solid var(--mona-border);
+}
+
+.msg-user .bubble {
+    background: linear-gradient(135deg, var(--mona-primary), var(--mona-accent));
+    border-bottom-right-radius: 4px;
+    box-shadow: 0 4px 12px rgba(56, 189, 248, 0.2);
+}
+
+.timestamp { font-size: 10px; color: rgba(255,255,255,0.3); margin: 0 4px; }
+
+/* SPECIAL: BIOMETRIC CARD */
+.security-card {
+    text-align: center; border: 1px solid rgba(74, 222, 128, 0.3) !important;
+    background: rgba(74, 222, 128, 0.05) !important;
+}
+.lock-icon { font-size: 24px; margin-bottom: 8px; }
+.security-card button {
+    background: #4ADE80; border: none; padding: 8px 16px; border-radius: 8px;
+    font-weight: 600; cursor: pointer; color: #064E3B; margin-top: 8px;
+}
+
+@keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+/* 5. FOOTER */
+.mona-footer { padding: 16px 24px; background: rgba(15, 23, 42, 0.8); }
+
+.input-container {
+    display: flex; align-items: flex-end; gap: 8px;
+    background: var(--mona-surface-solid);
+    border: 1px solid var(--mona-border);
+    padding: 8px; border-radius: 16px;
+}
+
+#mona-input {
+    flex: 1; background: transparent; border: none; color: white;
+    padding: 10px; font-size: 14px; resize: none; outline: none;
+    max-height: 100px;
+}
+
+#mona-send {
+    width: 36px; height: 36px; border-radius: 10px; border: none;
+    background: var(--mona-primary); color: #0F172A;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; transition: transform 0.2s;
+}
+#mona-send:active { transform: scale(0.9); }
+#mona-send svg { width: 18px; height: 18px; stroke: currentColor; stroke-width: 2; fill: none; }
+
+.btn-attach {
+    background: transparent; border: none; color: var(--mona-text-sub);
+    width: 32px; height: 36px; cursor: pointer; font-size: 20px;
+}
+
+/* 6. LAUNCHER (The Orb) */
+#mona-launcher {
+    width: var(--launcher-size); height: var(--launcher-size);
+    border-radius: 50%; border: none; cursor: pointer;
+    background: var(--mona-surface-solid);
+    box-shadow: 0 0 0 1px var(--mona-border), 0 10px 25px rgba(0,0,0,0.3);
+    position: relative; pointer-events: auto;
+    transition: transform 0.4s var(--ease-elastic);
+    display: flex; align-items: center; justify-content: center;
+}
+
+#mona-launcher:hover { transform: scale(1.1); }
+#mona-root.is-open #mona-launcher { transform: rotate(180deg); background: #EF4444; }
+
+.orb-core {
+    position: absolute; width: 40%; height: 40%;
+    background: var(--mona-primary); border-radius: 50%;
+    filter: blur(8px); opacity: 0.8; animation: breathe 3s infinite;
+}
+.orb-ring {
+    position: absolute; width: 100%; height: 100%; border-radius: 50%;
+    border: 2px solid var(--mona-primary); opacity: 0;
+    animation: ripple 3s infinite;
+}
+
+@keyframes breathe { 0%, 100% { transform: scale(1); opacity: 0.5; } 50% { transform: scale(1.2); opacity: 0.8; } }
+@keyframes ripple { 0% { transform: scale(0.8); opacity: 0.5; } 100% { transform: scale(1.5); opacity: 0; } }
+
+#mona-launcher svg {
+    position: absolute; width: 28px; height: 28px; fill: none; stroke: white; stroke-width: 2;
+    transition: all 0.3s;
+}
+.icon-close { opacity: 0; transform: rotate(-90deg); }
+#mona-root.is-open .icon-chat { opacity: 0; transform: rotate(90deg); }
+#mona-root.is-open .icon-close { opacity: 1; transform: rotate(0); }
