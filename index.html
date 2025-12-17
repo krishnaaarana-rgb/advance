@@ -1,40 +1,446 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Mona OS | Enterprise Demo</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+    <title>Mona Montreux | SYSTEM OS</title>
     
-    <link rel="stylesheet" href="mona-theme.css">
-    
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-</head>
-<body style="background: #e2e8f0; height: 100vh; display: flex; align-items: center; justify-content: center;">
 
-    <div style="text-align: center; color: #64748b;">
+    <style>
+        /* ========================================================================
+           THEME: "CYBER-LUXURY" ($10k AESTHETIC)
+           Complex gradients, noise textures, blur filters, terminal fonts.
+        ======================================================================== */
+        :root {
+            --neon-blue: #00f3ff;
+            --neon-purple: #bc13fe;
+            --glass-surface: rgba(10, 10, 12, 0.65);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --text-primary: #ffffff;
+            --text-secondary: rgba(255, 255, 255, 0.6);
+            --system-font: 'Space Grotesk', monospace;
+            --body-font: 'Inter', sans-serif;
+            --ease-out-expo: cubic-bezier(0.19, 1, 0.22, 1);
+        }
+
+        * { box-sizing: border-box; user-select: none; -webkit-tap-highlight-color: transparent; }
+        
+        body, html {
+            margin: 0; padding: 0; width: 100%; height: 100%;
+            overflow: hidden; background: #000;
+            font-family: var(--body-font);
+        }
+
+        /* BACKGROUND: Simulating a high-end hotel website behind the bot */
+        #simulated-site {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: radial-gradient(circle at 50% 50%, #1a1a2e 0%, #000000 100%);
+            z-index: 0; display: flex; align-items: center; justify-content: center;
+            color: #333; flex-direction: column;
+        }
+        #simulated-site h1 { font-family: 'Space Grotesk'; font-size: 4vw; opacity: 0.2; letter-spacing: 10px; text-transform: uppercase; }
+
+        /* ========================================================================
+           COMPONENT 1: THE "BOOT SEQUENCE" OVERLAY
+           (This sells the "Advanced" feel immediately)
+        ======================================================================== */
+        #boot-screen {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: #000; z-index: 9999999;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            font-family: var(--system-font); color: var(--neon-blue);
+        }
+        
+        .boot-log { font-size: 12px; opacity: 0.7; margin-top: 20px; text-align: left; width: 300px; }
+        .log-line { margin: 4px 0; opacity: 0; animation: typeLine 0.1s forwards; }
+        
+        .loader-ring {
+            width: 80px; height: 80px; border: 2px solid rgba(0, 243, 255, 0.2);
+            border-top: 2px solid var(--neon-blue); border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        /* ========================================================================
+           COMPONENT 2: THE "ORB" (Living Launcher)
+        ======================================================================== */
+        #mona-launcher {
+            position: fixed; bottom: 40px; right: 40px;
+            width: 80px; height: 80px; z-index: 99999;
+            cursor: pointer; transform-style: preserve-3d;
+            transition: transform 0.5s var(--ease-out-expo);
+        }
+        
+        #mona-launcher:hover { transform: scale(1.1); }
+        
+        .orb-outer {
+            position: absolute; width: 100%; height: 100%; border-radius: 50%;
+            border: 1px solid rgba(255,255,255,0.1);
+            background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.1), rgba(0,0,0,0.8));
+            backdrop-filter: blur(5px); box-shadow: 0 0 30px rgba(0, 243, 255, 0.2);
+            animation: float 6s ease-in-out infinite;
+        }
+        
+        .orb-core {
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            width: 40px; height: 40px; background: var(--neon-blue);
+            border-radius: 50%; filter: blur(15px);
+            animation: pulse-core 3s infinite;
+        }
+
+        .orb-ring {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            border: 1px solid var(--neon-blue); border-radius: 50%;
+            opacity: 0; animation: ripple 2s infinite;
+        }
+
+        /* ========================================================================
+           COMPONENT 3: THE "COMMAND CENTER" (The Chat Window)
+        ======================================================================== */
+        #mona-os {
+            position: fixed; bottom: 140px; right: 40px;
+            width: 450px; height: 750px;
+            background: var(--glass-surface);
+            backdrop-filter: blur(40px) saturate(150%);
+            -webkit-backdrop-filter: blur(40px) saturate(150%);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            box-shadow: 0 40px 100px rgba(0,0,0,0.6);
+            display: flex; flex-direction: column;
+            overflow: hidden; opacity: 0;
+            transform: translateY(50px) scale(0.9); pointer-events: none;
+            transition: all 0.6s var(--ease-out-expo);
+            z-index: 9999;
+        }
+
+        #mona-os.active {
+            opacity: 1; transform: translateY(0) scale(1); pointer-events: auto;
+        }
+
+        /* --- OS HEADER (Status & Stats) --- */
+        .os-header {
+            padding: 20px; border-bottom: 1px solid var(--glass-border);
+            background: rgba(0,0,0,0.2); display: flex; justify-content: space-between; align-items: center;
+        }
+        
+        .sys-info h2 { margin: 0; font-family: var(--system-font); font-size: 14px; letter-spacing: 2px; color: var(--text-primary); text-transform: uppercase; }
+        .sys-info .status { font-size: 10px; color: var(--neon-blue); display: flex; align-items: center; gap: 6px; margin-top: 4px; }
+        .blink { width: 6px; height: 6px; background: var(--neon-blue); border-radius: 50%; animation: blink 2s infinite; }
+
+        /* Fake System Graphs */
+        .sys-graphs { display: flex; gap: 4px; align-items: flex-end; height: 20px; }
+        .bar { width: 3px; background: var(--text-secondary); border-radius: 2px; animation: equalize 1s infinite alternate; }
+        .bar:nth-child(1) { height: 60%; animation-delay: 0.1s; }
+        .bar:nth-child(2) { height: 90%; animation-delay: 0.2s; }
+        .bar:nth-child(3) { height: 40%; animation-delay: 0.3s; }
+
+        /* --- STREAM (Chat Area) --- */
+        .os-stream {
+            flex: 1; padding: 20px; overflow-y: auto; overflow-x: hidden;
+            display: flex; flex-direction: column; gap: 20px;
+            /* Grid overlay for "tech" feel */
+            background-image: 
+                linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+            background-size: 40px 40px;
+        }
+
+        /* Messages */
+        .msg-row { display: flex; flex-direction: column; gap: 5px; opacity: 0; animation: slideUp 0.4s forwards; }
+        .msg-row.bot { align-items: flex-start; }
+        .msg-row.user { align-items: flex-end; }
+
+        .bubble {
+            max-width: 85%; padding: 14px 18px; font-size: 14px; line-height: 1.6;
+            color: var(--text-primary); border-radius: 12px; position: relative;
+        }
+        
+        .bubble.bot {
+            background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border);
+            border-left: 2px solid var(--neon-blue); /* Tech Accent */
+        }
+        
+        .bubble.user {
+            background: rgba(0, 243, 255, 0.15); border: 1px solid rgba(0, 243, 255, 0.3);
+            text-shadow: 0 0 10px rgba(0, 243, 255, 0.3);
+        }
+
+        .meta { font-family: var(--system-font); font-size: 9px; opacity: 0.5; margin: 0 5px; text-transform: uppercase; }
+
+        /* --- CARDS & WIDGETS --- */
+        .weather-widget {
+            background: linear-gradient(135deg, #1e293b, #0f172a); border-radius: 12px;
+            padding: 15px; display: flex; align-items: center; justify-content: space-between;
+            border: 1px solid var(--glass-border); margin-bottom: 10px;
+        }
+
+        /* --- INPUT DECK --- */
+        .os-footer {
+            padding: 20px; background: rgba(0,0,0,0.4);
+            border-top: 1px solid var(--glass-border);
+        }
+        
+        .input-wrapper {
+            position: relative; border: 1px solid var(--glass-border);
+            border-radius: 8px; background: rgba(255,255,255,0.03);
+            display: flex; align-items: center; padding: 5px;
+            transition: all 0.3s;
+        }
+        .input-wrapper:focus-within { border-color: var(--neon-blue); box-shadow: 0 0 15px rgba(0, 243, 255, 0.1); }
+
+        #cmd-input {
+            flex: 1; background: transparent; border: none; padding: 12px;
+            color: var(--text-primary); font-family: var(--body-font); font-size: 14px;
+            outline: none;
+        }
+
+        #send-btn {
+            width: 40px; height: 40px; background: var(--neon-blue);
+            border: none; border-radius: 6px; cursor: pointer;
+            color: #000; font-weight: bold;
+            display: flex; align-items: center; justify-content: center;
+        }
+
+        /* --- BIOMETRIC SCANNER OVERLAY --- */
+        #scan-overlay {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.8); z-index: 10;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            opacity: 0; pointer-events: none; transition: opacity 0.5s;
+        }
+        #scan-overlay.active { opacity: 1; pointer-events: auto; }
+        
+        .scan-line {
+            width: 100%; height: 2px; background: var(--neon-blue);
+            box-shadow: 0 0 20px var(--neon-blue);
+            animation: scan 2s infinite linear;
+            position: absolute; top: 0;
+        }
+        
+        .face-frame {
+            width: 200px; height: 200px; border: 2px solid rgba(255,255,255,0.2);
+            position: relative; border-radius: 20px; overflow: hidden;
+        }
+        .face-frame::after {
+            content: "AUTHENTICATING..."; position: absolute; bottom: 10px; width: 100%;
+            text-align: center; color: var(--neon-blue); font-family: var(--system-font); font-size: 10px; animation: blink 1s infinite;
+        }
+
+        /* ANIMATIONS */
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+        @keyframes pulse-core { 0%, 100% { opacity: 0.5; transform: translate(-50%, -50%) scale(1); } 50% { opacity: 1; transform: translate(-50%, -50%) scale(1.2); } }
+        @keyframes ripple { 0% { transform: scale(1); opacity: 0.8; } 100% { transform: scale(2); opacity: 0; } }
+        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+        @keyframes equalize { 0% { height: 20%; } 100% { height: 100%; } }
+        @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        @keyframes typeLine { to { opacity: 1; } }
+        @keyframes scan { 0% { top: 0%; opacity: 0; } 50% { opacity: 1; } 100% { top: 100%; opacity: 0; } }
+
+    </style>
+</head>
+<body>
+
+    <div id="simulated-site">
         <h1>Hotel Montreux</h1>
-        <p>Enterprise Chatbot Loaded.</p>
-        <p>Click the orb in the bottom right.</p>
     </div>
 
-    <script src="mona-core.js"></script> <script src="mona-ui.js"></script>   <script>
-        // BOOT SEQUENCE
-        document.addEventListener('DOMContentLoaded', async () => {
-            console.log("🚀 System: Booting...");
-            
-            // 1. Initialize Kernel
-            await window.MonaSystem.init();
-            
-            // 2. Initialize UI Engine (Attached to Kernel)
-            window.MonaSystem.ui = new UIController(window.MonaSystem);
-            
-            // 3. Inject into DOM
-            window.MonaSystem.ui.inject();
-            
-            console.log("✅ System: Online");
-        });
-    </script>
+    <div id="boot-screen">
+        <div class="loader-ring"></div>
+        <div class="boot-log" id="boot-log"></div>
+    </div>
 
+    <div id="mona-launcher" onclick="MonaOS.toggle()">
+        <div class="orb-ring"></div>
+        <div class="orb-outer"></div>
+        <div class="orb-core"></div>
+    </div>
+
+    <div id="mona-os">
+        
+        <div class="os-header">
+            <div class="sys-info">
+                <h2>Mona OS v12.4</h2>
+                <div class="status"><div class="blink"></div> SYSTEM ONLINE</div>
+            </div>
+            <div class="sys-graphs">
+                <div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div>
+            </div>
+        </div>
+
+        <div id="scan-overlay">
+            <div class="face-frame">
+                <div class="scan-line"></div>
+                <img src="https://cdn-icons-png.flaticon.com/512/747/747376.png" style="width: 100%; height: 100%; opacity: 0.2; filter: invert(1);">
+            </div>
+        </div>
+
+        <div class="os-stream" id="stream">
+            </div>
+
+        <div class="os-footer">
+            <div class="input-wrapper">
+                <input type="text" id="cmd-input" placeholder="Enter command or message..." autocomplete="off">
+                <button id="send-btn" onclick="MonaOS.send()">➜</button>
+            </div>
+        </div>
+    </div>
+
+<script>
+    /**
+     * MONA OS - MAXIMALIST EDITION
+     * "Because less code isn't luxury."
+     */
+    const MonaOS = (() => {
+        
+        const STATE = {
+            booted: false,
+            open: false,
+            authenticated: false,
+            soundEnabled: true,
+            history: []
+        };
+        
+        const DOM = {
+            boot: document.getElementById('boot-screen'),
+            log: document.getElementById('boot-log'),
+            os: document.getElementById('mona-os'),
+            stream: document.getElementById('stream'),
+            input: document.getElementById('cmd-input'),
+            scan: document.getElementById('scan-overlay')
+        };
+
+        const CONFIG = {
+            webhook: "https://n8n.srv1106816.hstgr.cloud/webhook/595269c9-1640-45c9-9c2b-861a69417966"
+        };
+
+        // --- 1. BOOT SEQUENCE (The "Movie" Intro) ---
+        const runBoot = async () => {
+            const lines = [
+                "INITIALIZING NEURAL NET...",
+                "CHECKING BIOMETRIC SENSORS...",
+                "CONNECTING TO HOTEL SECURE SERVER...",
+                "LOADING CONCIERGE PROTOCOLS...",
+                "SYSTEM READY."
+            ];
+
+            for (let line of lines) {
+                const div = document.createElement('div');
+                div.className = 'log-line';
+                div.innerText = "> " + line;
+                DOM.log.appendChild(div);
+                await wait(400); // Fake processing time
+            }
+
+            await wait(500);
+            DOM.boot.style.opacity = '0';
+            setTimeout(() => DOM.boot.remove(), 1000);
+            STATE.booted = true;
+            
+            // Auto-open first time
+            setTimeout(() => toggle(), 800);
+        };
+
+        // --- 2. CORE FUNCTIONS ---
+        const toggle = () => {
+            STATE.open = !STATE.open;
+            DOM.os.classList.toggle('active', STATE.open);
+            
+            if (STATE.open && !STATE.authenticated) {
+                runBiometrics();
+            }
+        };
+
+        const runBiometrics = async () => {
+            DOM.scan.classList.add('active');
+            await wait(2000); // Fake scan time
+            DOM.scan.classList.remove('active');
+            STATE.authenticated = true;
+            
+            addMessage({ text: "Identity Verified. Welcome, Guest.", sender: 'system' });
+            
+            if (STATE.history.length === 0) {
+                addMessage({ text: "I am Mona. I have access to Room Service, Spa Bookings, and Local Transport. How may I assist?", sender: 'bot' });
+            }
+        };
+
+        const addMessage = (msg) => {
+            const div = document.createElement('div');
+            div.className = `msg-row ${msg.sender}`;
+            
+            let content = msg.text;
+            if (msg.sender === 'bot') content = marked.parse(msg.text);
+
+            div.innerHTML = `
+                <div class="meta">${msg.sender === 'bot' ? 'AI CORE' : 'GUEST'} // ${new Date().toLocaleTimeString()}</div>
+                <div class="bubble ${msg.sender}">${content}</div>
+            `;
+            
+            DOM.stream.appendChild(div);
+            DOM.stream.scrollTop = DOM.stream.scrollHeight;
+        };
+
+        const send = async () => {
+            const text = DOM.input.value.trim();
+            if(!text) return;
+
+            DOM.input.value = '';
+            addMessage({ text, sender: 'user' });
+
+            // Fake "Processing" state
+            const processingId = showProcessing();
+
+            try {
+                const response = await fetch(CONFIG.webhook, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ chatInput: text, sessionId: 'MAX_OS_' + Date.now() })
+                });
+                
+                removeProcessing(processingId);
+                
+                const data = await response.json();
+                let reply = "Signal lost.";
+                if (Array.isArray(data) && data[0]) reply = data[0].output || data[0].text;
+                else if (data.output || data.text) reply = data.output || data.text;
+
+                addMessage({ text: reply, sender: 'bot' });
+
+            } catch (e) {
+                removeProcessing(processingId);
+                addMessage({ text: "CRITICAL ERROR: Neural Link Severed.", sender: 'system' });
+            }
+        };
+
+        // --- UTILS ---
+        const showProcessing = () => {
+            const id = 'proc-' + Date.now();
+            const div = document.createElement('div');
+            div.id = id;
+            div.className = 'msg-row bot';
+            div.innerHTML = `<div class="meta">SYSTEM</div><div class="bubble bot" style="color:var(--neon-blue)">ANALYZING REQUEST...</div>`;
+            DOM.stream.appendChild(div);
+            return id;
+        };
+
+        const removeProcessing = (id) => {
+            const el = document.getElementById(id);
+            if(el) el.remove();
+        };
+
+        const wait = (ms) => new Promise(r => setTimeout(r, ms));
+
+        // Event Listeners
+        DOM.input.addEventListener('keydown', (e) => {
+            if(e.key === 'Enter') send();
+        });
+
+        // Start
+        window.onload = runBoot;
+
+        return { toggle, send };
+    })();
+</script>
 </body>
 </html>
